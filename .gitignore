@@ -2,3 +2,5 @@ build
 layers
 .tox
 interfaces
+.testrepository
+*__pycache__*

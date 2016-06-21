@@ -10,9 +10,24 @@ AODH_DIR = '/etc/aodh'
 AODH_CONF = os.path.join(AODH_DIR, 'aodh.conf')
 
 
-class AodhCharm(charms_openstack.charm.OpenStackCharm):
+class AodhAdapters(charms_openstack.adapters.OpenStackRelationAdapters):
+    """
+    Adapters class for the Aodh charm.
+    """
+    def __init__(self, relations):
+        print(relations)
+        super(AodhAdapters, self).__init__(
+            relations,
+            options_instance=charms_openstack.adapters.APIConfigurationAdapter(
+                port_map=AodhCharm.api_ports))
 
-    service_name = 'aodh'
+
+class AodhCharm(charms_openstack.charm.HAOpenStackCharm):
+
+    # Internal name of charm + keystone endpoint
+    service_name = name = 'aodh'
+
+    # First release supported
     release = 'mitaka'
 
     # Packages the service needs installed
@@ -46,12 +61,19 @@ class AodhCharm(charms_openstack.charm.OpenStackCharm):
         AODH_CONF: services,
     }
 
+    # Resource when in HA mode
+    ha_resources = ['vips', 'haproxy']
+
     # Aodh requires a message queue, database and keystone to work,
     # so these are the 'required' relationships for the service to
     # have an 'active' workload status.  'required_relations' is used in
     # the assess_status() functionality to determine what the current
     # workload status of the charm is.
     required_relations = ['amqp', 'shared-db', 'identity-service']
+
+    # Set the adapters class to on specific to Aodh
+    # NOTE: review this seems odd as not doing anything off piste here
+    adapters_class = AodhAdapters
 
     def __init__(self, release=None, **kwargs):
         """Custom initialiser for class
@@ -115,3 +137,9 @@ def assess_status():
     status on the unit.
     """
     AodhCharm.singleton.assess_status()
+
+
+def configure_ha_resources(hacluster):
+    """Use the singleton from the AodhCharm to run configure_ha_resources
+    """
+    AodhCharm.singleton.configure_ha_resources(hacluster)

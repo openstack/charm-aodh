@@ -6,6 +6,13 @@ import charmhelpers.core.hookenv as hookenv
 import charm.openstack.aodh as aodh
 
 
+MINIMAL_INTERFACES = [
+    'shared-db.available',
+    'identity-service.available',
+    'amqp.available',
+]
+
+
 # use a synthetic state to ensure that it get it to be installed independent of
 # the install hook.
 @reactive.when_not('charm.installed')
@@ -39,13 +46,22 @@ def setup_endpoint(keystone):
     aodh.assess_status()
 
 
-@reactive.when('shared-db.available')
-@reactive.when('identity-service.available')
-@reactive.when('amqp.available')
-def render_stuff(*args):
+def render(*args):
     aodh.render_configs(args)
     reactive.set_state('config.complete')
     aodh.assess_status()
+
+
+@reactive.when_not('cluster.available')
+@reactive.when(*MINIMAL_INTERFACES)
+def render_unclustered(*args):
+    render(*args)
+
+
+@reactive.when('cluster.available')
+@reactive.when(*MINIMAL_INTERFACES)
+def render_clustered(*args):
+    render(*args)
 
 
 @reactive.when('config.complete')
@@ -55,3 +71,13 @@ def run_db_migration():
     aodh.restart_all()
     reactive.set_state('db.synced')
     aodh.assess_status()
+
+
+@reactive.when('ha.connected')
+def cluster_connected(hacluster):
+    aodh.configure_ha_resources(hacluster)
+
+
+@reactive.hook('upgrade-charm')
+def upgrade_charm():
+    aodh.install()
