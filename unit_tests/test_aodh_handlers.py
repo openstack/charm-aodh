@@ -113,12 +113,9 @@ class TestAodhHandlers(unittest.TestCase):
                 self.assertTrue(f in p.keys(),
                                 "{} not found".format(f))
                 # check that the lists are equal
-                print(args)
-                # [{'kwargs': {}, 'args': ('amqp.connected',)}]
                 l = []
                 for a in args:
                     l += a['args'][:]
-                #l = [enumerate(a['args']) for a in args]
                 self.assertEqual(sorted(l), sorted(p[f]),
                                  "{}: incorrect state registration".format(f))
 
