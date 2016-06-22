@@ -6,6 +6,7 @@ import charmhelpers.core.hookenv as hookenv
 import charm.openstack.aodh as aodh
 
 
+# Minimal inferfaces required for operation
 MINIMAL_INTERFACES = [
     'shared-db.available',
     'identity-service.available',
@@ -58,8 +59,8 @@ def render_unclustered(*args):
     render(*args)
 
 
-@reactive.when('cluster.available')
-@reactive.when(*MINIMAL_INTERFACES)
+@reactive.when('cluster.available',
+               *MINIMAL_INTERFACES)
 def render_clustered(*args):
     render(*args)
 
