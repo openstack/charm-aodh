@@ -143,20 +143,12 @@ class TestAodhHandlers(unittest.TestCase):
     def test_setup_amqp_req(self):
         self.patch(handlers.aodh, 'assess_status')
         amqp = mock.MagicMock()
-        reply = {
-            'rabbit-user': 'user1',
-            'rabbit-vhost': 'vhost1',
-        }
         handlers.setup_amqp_req(amqp)
         amqp.request_access.assert_called_once_with(
             username='aodh', vhost='openstack')
 
     def test_database(self):
         database = mock.MagicMock()
-        reply = {
-            'database': 'db1',
-            'database-user': 'dbuser1',
-        }
         self.patch(handlers.hookenv, 'unit_private_ip', 'private_ip')
         self.patch(handlers.aodh, 'assess_status')
         handlers.setup_database(database)
@@ -169,7 +161,7 @@ class TestAodhHandlers(unittest.TestCase):
         handlers.setup_endpoint('endpoint_object')
         self.setup_endpoint.assert_called_once_with('endpoint_object')
 
-    def test_render_unclustered(self):
+    def test_render(self):
         self.patch(handlers.aodh, 'render_configs')
         self.patch(handlers.aodh, 'assess_status')
         handlers.render_unclustered('arg1', 'arg2')
