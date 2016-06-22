@@ -2,7 +2,10 @@ import subprocess
 import amulet
 import json
 import time
+
 import aodhclient.client as aodh_client
+from keystoneclient import session as keystone_session
+from keystoneclient.auth import identity as keystone_identity
 
 from charmhelpers.contrib.openstack.amulet.deployment import (
     OpenStackAmuletDeployment
@@ -43,7 +46,7 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
            compatible with the local charm (e.g. stable or next).
            """
         this_service = {'name': 'aodh'}
-        other_services = [{'name': 'percona-cluster'},
+        other_services = [{'name': 'mysql'},
                           {'name': 'rabbitmq-server'},
                           {'name': 'keystone'},
                           {'name': 'mongodb'},
@@ -54,10 +57,10 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
     def _add_relations(self):
         """Add all of the relations for the services."""
         relations = {
-            'aodh:shared-db': 'percona-cluster:shared-db',
+            'aodh:shared-db': 'mysql:shared-db',
             'aodh:amqp': 'rabbitmq-server:amqp',
             'aodh:identity-service': 'keystone:identity-service',
-            'keystone:shared-db': 'percona-cluster:shared-db',
+            'keystone:shared-db': 'mysql:shared-db',
             'ceilometer:identity-service': 'keystone:identity-service',
             'ceilometer:shared-db': 'mongodb:database',
             'ceilometer:amqp': 'rabbitmq-server:amqp',
@@ -77,12 +80,12 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
     def _initialize_tests(self):
         """Perform final initialization before tests get run."""
         # Access the sentries for inspecting service units
-        self.aodh_sentry = self.d.sentry.unit['aodh'][0]
-        self.mysql_sentry = self.d.sentry.unit['percona-cluster'][0]
-        self.keystone_sentry = self.d.sentry.unit['keystone'][0]
-        self.rabbitmq_sentry = self.d.sentry.unit['rabbitmq-server'][0]
-        self.mongodb_sentry = self.d.sentry.unit['mongodb'][0]
-        self.ceil_sentry = self.d.sentry.unit['ceilometer'][0]
+        self.aodh_sentry = self.d.sentry['aodh'][0]
+        self.mysql_sentry = self.d.sentry['mysql'][0]
+        self.keystone_sentry = self.d.sentry['keystone'][0]
+        self.rabbitmq_sentry = self.d.sentry['rabbitmq-server'][0]
+        self.mongodb_sentry = self.d.sentry['mongodb'][0]
+        self.ceil_sentry = self.d.sentry['ceilometer'][0]
         u.log.debug('openstack release val: {}'.format(
             self._get_openstack_release()))
         u.log.debug('openstack release str: {}'.format(
@@ -95,11 +98,16 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
                                                       tenant='admin')
 
         # Authenticate admin with aodh endpoint
-        ep = self.keystone.service_catalog.url_for(service_type='alarming',
-                                                   endpoint_type='publicURL')
+        aodh_ep = self.keystone.service_catalog.url_for(service_type='alarming',
+                                                        endpoint_type='publicURL')
+        keystone_ep = self.keystone.service_catalog.url_for(service_type='identity',
+                                                            endpoint_type='publicURL')
         os_token = self.keystone.auth_token
-        self.log.debug('Instantiating aodh client...')
-        self.aodh = aodh_client.Client(endpoint=ep, token=os_token)
+        auth = keystone_identity.V2Token(auth_url=keystone_ep,
+                                         token=self.keystone.auth_token)
+        sess = keystone_session.Session(auth=auth)
+        self.aodh = aodh_client.Client(version=2, session=sess,
+                                       endpoint_override=aodh_ep)
 
     def _run_action(self, unit_id, action, *args):
         command = ["juju", "action", "do", "--format=json", unit_id, action]
@@ -253,7 +261,7 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
     def test_203_aodh_amqp_relation(self):
         """Verify the aodh to rabbitmq-server amqp relation data"""
         u.log.debug('Checking aodh:rabbitmq amqp relation data...')
-        unit = self.ceil_sentry
+        unit = self.aodh_sentry
         relation = ['amqp', 'rabbitmq-server:amqp']
         expected = {
             'username': 'aodh',
@@ -340,7 +348,7 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
         """The services can be paused and resumed. """
         u.log.debug('Checking pause and resume actions...')
         unit_name = "aodh/0"
-        unit = self.d.sentry.unit['aodh'][0]
+        unit = self.d.sentry['aodh'][0]
         juju_service = 'aodh'
 
         assert u.status_get(unit)[0] == "active"
