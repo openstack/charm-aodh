@@ -299,7 +299,7 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
     def test_400_api_connection(self):
         """Simple api calls to check service is up and responding"""
         u.log.debug('Checking api functionality...')
-        assert(self.aodh.capabilities.list() == [])
+        assert(self.aodh.capabilities.list() != [])
         u.log.debug('OK')
 
     def test_900_restart_on_config_change(self):
