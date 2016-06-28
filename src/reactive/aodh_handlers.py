@@ -67,18 +67,21 @@ def render(*args):
     aodh.assess_status()
 
 
+@reactive.when('charm.installed')
 @reactive.when_not('cluster.available')
 @reactive.when(*MINIMAL_INTERFACES)
 def render_unclustered(*args):
     render(*args)
 
 
+@reactive.when('charm.installed')
 @reactive.when('cluster.available',
                *MINIMAL_INTERFACES)
 def render_clustered(*args):
     render(*args)
 
 
+@reactive.when('charm.installed')
 @reactive.when('config.complete')
 @reactive.when_not('db.synced')
 def run_db_migration():
