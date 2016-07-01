@@ -9,6 +9,9 @@ description: |
  overall system.
  .
  Aodh provides the Alarming service as part of OpenStack telemetry.
+series:
+  - xenial
+  - trusty
 requires:
   mongodb:
     interface: mongodb
