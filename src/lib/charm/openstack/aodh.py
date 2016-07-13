@@ -24,7 +24,7 @@ AODH_DIR = '/etc/aodh'
 AODH_CONF = os.path.join(AODH_DIR, 'aodh.conf')
 
 
-class AodhAdapters(charms_openstack.adapters.OpenStackRelationAdapters):
+class AodhAdapters(charms_openstack.adapters.OpenStackAPIRelationAdapters):
     """
     Adapters class for the Aodh charm.
     """
