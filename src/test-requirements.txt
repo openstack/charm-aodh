@@ -19,3 +19,5 @@ python-swiftclient>=2.6.0,<3.0
 pika>=0.10.0,<1.0
 distro-info
 # END: Amulet OpenStack Charm Helper Requirements
+# NOTE: workaround for 14.04 pip/tox
+pytz
