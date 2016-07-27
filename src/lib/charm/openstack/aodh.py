@@ -45,9 +45,11 @@ class AodhCharm(charms_openstack.charm.HAOpenStackCharm):
     release = 'mitaka'
 
     # Packages the service needs installed
+    # LY Hacluster depends on python-apt so fixing it here is a temporary
+    # tactical fix. Bug #1606906
     packages = ['aodh-api', 'aodh-evaluator',
                 'aodh-expirer', 'aodh-notifier',
-                'aodh-listener']
+                'aodh-listener', 'python-apt']
 
     # Init services the charm manages
     services = ['aodh-api', 'aodh-evaluator',
