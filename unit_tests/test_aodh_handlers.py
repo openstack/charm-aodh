@@ -167,6 +167,8 @@ class TestAodhHandlers(unittest.TestCase):
     def test_render(self):
         self.patch(handlers.aodh, 'render_configs')
         self.patch(handlers.aodh, 'assess_status')
+        self.patch(handlers.aodh, 'configure_ssl')
         handlers.render_unclustered('arg1', 'arg2')
         self.render_configs.assert_called_once_with(('arg1', 'arg2', ))
         self.assess_status.assert_called_once()
+        self.configure_ssl.assert_called_once()

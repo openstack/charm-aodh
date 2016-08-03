@@ -71,6 +71,7 @@ def render(*args):
 @reactive.when_not('cluster.available')
 @reactive.when(*MINIMAL_INTERFACES)
 def render_unclustered(*args):
+    aodh.configure_ssl()
     render(*args)
 
 
