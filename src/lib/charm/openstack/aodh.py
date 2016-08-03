@@ -29,10 +29,10 @@ class AodhAdapters(charms_openstack.adapters.OpenStackAPIRelationAdapters):
     Adapters class for the Aodh charm.
     """
     def __init__(self, relations):
-        print(relations)
         super(AodhAdapters, self).__init__(
             relations,
             options_instance=charms_openstack.adapters.APIConfigurationAdapter(
+                service_name='aodh',
                 port_map=AodhCharm.api_ports))
 
 
@@ -159,3 +159,9 @@ def configure_ha_resources(hacluster):
     """Use the singleton from the AodhCharm to run configure_ha_resources
     """
     AodhCharm.singleton.configure_ha_resources(hacluster)
+
+
+def configure_ssl():
+    """Use the singleton from the AodhCharm to run configure_ssl
+    """
+    AodhCharm.singleton.configure_ssl()
