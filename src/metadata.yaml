@@ -12,6 +12,7 @@ description: |
 series:
   - xenial
   - trusty
+  - yakkety
 requires:
   mongodb:
     interface: mongodb

@@ -28,12 +28,13 @@ class AodhAdapters(charms_openstack.adapters.OpenStackAPIRelationAdapters):
     """
     Adapters class for the Aodh charm.
     """
-    def __init__(self, relations):
+    def __init__(self, relations, charm_instance=None):
         super(AodhAdapters, self).__init__(
             relations,
             options_instance=charms_openstack.adapters.APIConfigurationAdapter(
                 service_name='aodh',
-                port_map=AodhCharm.api_ports))
+                port_map=AodhCharm.api_ports),
+            charm_instance=charm_instance)
 
 
 class AodhCharm(charms_openstack.charm.HAOpenStackCharm):
