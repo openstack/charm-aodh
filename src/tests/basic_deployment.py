@@ -33,9 +33,10 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
         self._deploy()
 
         u.log.info('Waiting on extended status checks...')
-        exclude_services = ['mysql', 'mongodb']
+        exclude_services = ['mongodb']
         self._auto_wait_for_status(exclude_services=exclude_services)
 
+        self.d.sentry.wait()
         self._initialize_tests()
 
     def _add_services(self):
@@ -46,21 +47,23 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
            compatible with the local charm (e.g. stable or next).
            """
         this_service = {'name': 'aodh'}
-        other_services = [{'name': 'mysql'},
-                          {'name': 'rabbitmq-server'},
-                          {'name': 'keystone'},
-                          {'name': 'mongodb'},
-                          {'name': 'ceilometer'}]
+        other_services = [
+            {'name': 'percona-cluster', 'constraints': {'mem': '3072M'}},
+            {'name': 'rabbitmq-server'},
+            {'name': 'keystone'},
+            {'name': 'mongodb'},
+            {'name': 'ceilometer'}
+        ]
         super(AodhBasicDeployment, self)._add_services(this_service,
                                                        other_services)
 
     def _add_relations(self):
         """Add all of the relations for the services."""
         relations = {
-            'aodh:shared-db': 'mysql:shared-db',
+            'aodh:shared-db': 'percona-cluster:shared-db',
             'aodh:amqp': 'rabbitmq-server:amqp',
             'aodh:identity-service': 'keystone:identity-service',
-            'keystone:shared-db': 'mysql:shared-db',
+            'keystone:shared-db': 'percona-cluster:shared-db',
             'ceilometer:identity-service': 'keystone:identity-service',
             'ceilometer:shared-db': 'mongodb:database',
             'ceilometer:amqp': 'rabbitmq-server:amqp',
@@ -69,9 +72,20 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
 
     def _configure_services(self):
         """Configure all of the services."""
-        keystone_config = {'admin-password': 'openstack',
-                           'admin-token': 'ubuntutesting'}
-        configs = {'keystone': keystone_config}
+        keystone_config = {
+            'admin-password': 'openstack',
+            'admin-token': 'ubuntutesting'
+        }
+        pxc_config = {
+            'dataset-size': '25%',
+            'max-connections': 1000,
+            'root-password': 'ChangeMe123',
+            'sst-password': 'ChangeMe123',
+        }
+        configs = {
+            'keystone': keystone_config,
+            'percona-cluster': pxc_config,
+        }
         super(AodhBasicDeployment, self)._configure_services(configs)
 
     def _get_token(self):
@@ -81,7 +95,7 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
         """Perform final initialization before tests get run."""
         # Access the sentries for inspecting service units
         self.aodh_sentry = self.d.sentry['aodh'][0]
-        self.mysql_sentry = self.d.sentry['mysql'][0]
+        self.pxc_sentry = self.d.sentry['percona-cluster'][0]
         self.keystone_sentry = self.d.sentry['keystone'][0]
         self.rabbitmq_sentry = self.d.sentry['rabbitmq-server'][0]
         self.mongodb_sentry = self.d.sentry['mongodb'][0]
