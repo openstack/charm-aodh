@@ -13,8 +13,10 @@
 # limitations under the License.
 
 import os
+import subprocess
 
 import charmhelpers.contrib.openstack.utils as ch_utils
+import charmhelpers.core.host as ch_host
 
 import charms_openstack.charm
 import charms_openstack.adapters
@@ -22,6 +24,9 @@ import charms_openstack.ip as os_ip
 
 AODH_DIR = '/etc/aodh'
 AODH_CONF = os.path.join(AODH_DIR, 'aodh.conf')
+AODH_API_SYSTEMD_CONF = (
+    '/etc/systemd/system/aodh-api.service.d/override.conf'
+)
 
 
 class AodhAdapters(charms_openstack.adapters.OpenStackAPIRelationAdapters):
@@ -56,9 +61,6 @@ class AodhCharm(charms_openstack.charm.HAOpenStackCharm):
     services = ['aodh-api', 'aodh-evaluator',
                 'aodh-notifier', 'aodh-listener']
 
-    # Standard interface adapters class to use.
-    adapters_class = charms_openstack.adapters.OpenStackRelationAdapters
-
     # Ports that need exposing.
     default_service = 'aodh-api'
     api_ports = {
@@ -76,6 +78,7 @@ class AodhCharm(charms_openstack.charm.HAOpenStackCharm):
     # file changes
     restart_map = {
         AODH_CONF: services,
+        AODH_API_SYSTEMD_CONF: 'aodh-api',
     }
 
     # Resource when in HA mode
@@ -166,3 +169,12 @@ def configure_ssl():
     """Use the singleton from the AodhCharm to run configure_ssl
     """
     AodhCharm.singleton.configure_ssl()
+
+
+# TODO: drop once charm switches to apache+mod_wsgi
+def reload_and_restart():
+    """Reload systemd and restart aodh-api when override file changes
+    """
+    if ch_host.init_is_systemd():
+        subprocess.check_call(['systemctl', 'daemon-reload'])
+        ch_host.service_restart('aodh-api')
