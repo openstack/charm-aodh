@@ -95,6 +95,8 @@ class TestAodhAdapters(Helper):
         config.side_effect = lambda: reply
         self.patch(aodh.charms_openstack.adapters.APIConfigurationAdapter,
                    'get_network_addresses')
+        cluster_relation = mock.MagicMock()
+        cluster_relation.relation_name = 'cluster'
         amqp_relation = mock.MagicMock()
         amqp_relation.relation_name = 'amqp'
         shared_db_relation = mock.MagicMock()
@@ -104,6 +106,7 @@ class TestAodhAdapters(Helper):
         other_relation.thingy = 'help'
         # verify that the class is created with a AodhConfigurationAdapter
         b = aodh.AodhAdapters([amqp_relation,
+                               cluster_relation,
                                shared_db_relation,
                                other_relation])
         # ensure that the relevant things got put on.
