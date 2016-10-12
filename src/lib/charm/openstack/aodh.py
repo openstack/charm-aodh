@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import collections
 import os
 import subprocess
 
@@ -95,6 +96,15 @@ class AodhCharm(charms_openstack.charm.HAOpenStackCharm):
     # NOTE: review this seems odd as not doing anything off piste here
     adapters_class = AodhAdapters
 
+    release_pkg = 'aodh-common'
+    package_codenames = {
+        'aodh-common': collections.OrderedDict([
+            ('2', 'mitaka'),
+            ('3', 'newton'),
+            ('4', 'ocata'),
+        ]),
+    }
+
     def __init__(self, release=None, **kwargs):
         """Custom initialiser for class
         If no release is passed, then the charm determines the release from the
@@ -169,6 +179,15 @@ def configure_ssl():
     """Use the singleton from the AodhCharm to run configure_ssl
     """
     AodhCharm.singleton.configure_ssl()
+
+
+def upgrade_if_available(interfaces_list):
+    """Just call the AodhCharm.singleton.upgrade_if_available() command to
+    update OpenStack package if upgrade is available
+
+    @returns: None
+    """
+    AodhCharm.singleton.upgrade_if_available(interfaces_list)
 
 
 # TODO: drop once charm switches to apache+mod_wsgi
