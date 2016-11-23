@@ -333,12 +333,22 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
         # Services which are expected to restart upon config change,
         # and corresponding config files affected by the change
         conf_file = '/etc/aodh/aodh.conf'
-        services = {
-            'aodh-api': conf_file,
-            'aodh-evaluator': conf_file,
-            'aodh-notifier': conf_file,
-            'aodh-listener': conf_file,
-        }
+        if self._get_openstack_release() >= self.xenial_newton:
+            services = {
+                ('/usr/bin/python /usr/bin/aodh-api --port 8032 -- '
+                 '--config-file=/etc/aodh/aodh.conf '
+                 '--log-file=/var/log/aodh/aodh-api.log'): conf_file,
+                'aodh-evaluator - AlarmEvaluationService(0)': conf_file,
+                'aodh-notifier - AlarmNotifierService(0)': conf_file,
+                'aodh-listener - EventAlarmEvaluationService(0)': conf_file,
+            }
+        else:
+            services = {
+                'aodh-api': conf_file,
+                'aodh-evaluator': conf_file,
+                'aodh-notifier': conf_file,
+                'aodh-listener': conf_file,
+            }
 
         # Make config change, check for service restarts
         u.log.debug('Making config change on {}...'.format(juju_service))

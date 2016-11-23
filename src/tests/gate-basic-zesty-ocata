@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-"""Amulet tests on a basic aodh deployment on yakkety-newton."""
+"""Amulet tests on a basic aodh deployment on zesty-ocata."""
 
 from basic_deployment import AodhBasicDeployment
 
 if __name__ == '__main__':
-    deployment = AodhBasicDeployment(series='yakkety')
+    deployment = AodhBasicDeployment(series='zesty')
     deployment.run_tests()
 
