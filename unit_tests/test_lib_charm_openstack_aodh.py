@@ -47,15 +47,11 @@ class Helper(unittest.TestCase):
 class TestOpenStackAodh(Helper):
 
     def test_install(self):
-        self.patch(aodh.AodhCharm,
-                   'set_config_defined_certs_and_keys')
         self.patch(aodh.AodhCharm.singleton, 'install')
         aodh.install()
         self.install.assert_called_once_with()
 
     def test_setup_endpoint(self):
-        self.patch(aodh.AodhCharm,
-                   'set_config_defined_certs_and_keys')
         self.patch(aodh.AodhCharm, 'service_name',
                    new_callable=mock.PropertyMock)
         self.patch(aodh.AodhCharm, 'region',
@@ -77,8 +73,6 @@ class TestOpenStackAodh(Helper):
             'type1', 'region1', 'public_url', 'internal_url', 'admin_url')
 
     def test_render_configs(self):
-        self.patch(aodh.AodhCharm,
-                   'set_config_defined_certs_and_keys')
         self.patch(aodh.AodhCharm.singleton, 'render_with_interfaces')
         aodh.render_configs('interfaces-list')
         self.render_with_interfaces.assert_called_once_with(
@@ -123,15 +117,11 @@ class TestAodhAdapters(Helper):
 class TestAodhCharm(Helper):
 
     def test__init__(self):
-        self.patch(aodh.AodhCharm,
-                   'set_config_defined_certs_and_keys')
         self.patch(aodh.ch_utils, 'os_release')
         aodh.AodhCharm()
         self.os_release.assert_called_once_with('python-keystonemiddleware')
 
     def test_install(self):
-        self.patch(aodh.AodhCharm,
-                   'set_config_defined_certs_and_keys')
         b = aodh.AodhCharm()
         self.patch(aodh.charms_openstack.charm.OpenStackCharm,
                    'configure_source')

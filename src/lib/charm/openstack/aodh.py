@@ -114,14 +114,6 @@ class AodhCharm(charms_openstack.charm.HAOpenStackCharm):
             release = ch_utils.os_release('python-keystonemiddleware')
         super(AodhCharm, self).__init__(release=release, **kwargs)
 
-    def install(self):
-        """Customise the installation, configure the source and then call the
-        parent install() method to install the packages
-        """
-        self.configure_source()
-        # and do the actual install
-        super(AodhCharm, self).install()
-
 
 def install():
     """Use the singleton from the AodhCharm to install the packages on the
