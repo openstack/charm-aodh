@@ -157,11 +157,11 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
            service units."""
         u.log.debug('Checking system services on units...')
 
-        aodh_svcs = [
-            'aodh-api', 'aodh-evaluator',
-            'aodh-notifier', 'aodh-listener'
-        ]
-
+        aodh_svcs = ['aodh-evaluator', 'aodh-notifier', 'aodh-listener']
+        if self._get_openstack_release() >= self.xenial_ocata:
+            aodh_svcs.append('apache2')
+        else:
+            aodh_svcs.append('aodh-api')
         if self._get_openstack_release() < self.trusty_mitaka:
             aodh_svcs.append('aodh-alarm-evaluator')
             aodh_svcs.append('aodh-alarm-notifier')
@@ -333,7 +333,14 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
         # Services which are expected to restart upon config change,
         # and corresponding config files affected by the change
         conf_file = '/etc/aodh/aodh.conf'
-        if self._get_openstack_release() >= self.xenial_newton:
+        if self._get_openstack_release() >= self.xenial_ocata:
+            services = {
+                'apache2': conf_file,
+                'aodh-evaluator - AlarmEvaluationService(0)': conf_file,
+                'aodh-notifier - AlarmNotifierService(0)': conf_file,
+                'aodh-listener - EventAlarmEvaluationService(0)': conf_file,
+            }
+        elif self._get_openstack_release() >= self.xenial_newton:
             services = {
                 ('/usr/bin/python /usr/bin/aodh-api --port 8032 -- '
                  '--config-file=/etc/aodh/aodh.conf '

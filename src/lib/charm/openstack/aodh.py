@@ -16,7 +16,6 @@ import collections
 import os
 import subprocess
 
-import charmhelpers.contrib.openstack.utils as ch_utils
 import charmhelpers.core.host as ch_host
 
 import charms_openstack.charm
@@ -28,6 +27,10 @@ AODH_CONF = os.path.join(AODH_DIR, 'aodh.conf')
 AODH_API_SYSTEMD_CONF = (
     '/etc/systemd/system/aodh-api.service.d/override.conf'
 )
+AODH_WSGI_CONF = '/etc/apache2/sites-available/aodh-api.conf'
+
+
+charms_openstack.charm.use_defaults('charm.default-select-release')
 
 
 class AodhAdapters(charms_openstack.adapters.OpenStackAPIRelationAdapters):
@@ -105,14 +108,41 @@ class AodhCharm(charms_openstack.charm.HAOpenStackCharm):
         ]),
     }
 
-    def __init__(self, release=None, **kwargs):
-        """Custom initialiser for class
-        If no release is passed, then the charm determines the release from the
-        ch_utils.os_release() function.
-        """
-        if release is None:
-            release = ch_utils.os_release('python-keystonemiddleware')
-        super(AodhCharm, self).__init__(release=release, **kwargs)
+    @staticmethod
+    def reload_and_restart():
+        if ch_host.init_is_systemd():
+            subprocess.check_call(['systemctl', 'daemon-reload'])
+            ch_host.service_restart('aodh-api')
+
+
+class AodhCharmOcata(AodhCharm):
+    """From ocata onwards there is no aodh-api service, as this is handled via
+    apache2 with a wsgi handler.  Therefore, these specialisations are simple
+    to switch out the aodh-api.
+    """
+
+    # This charms support Ocata and onward
+    release = 'ocata'
+
+    # Init services the charm manages
+    # Ocata onwards uses apache2 rather than aodh-api
+    services = ['aodh-evaluator', 'aodh-notifier',
+                'aodh-listener', 'apache2']
+
+    # The restart map defines which services should be restarted when a given
+    # file changes
+    # Ocata onwards doesn't require aodh-api and the AODH_API_SYSTEMD_CONF
+    # file.
+    restart_map = {
+        AODH_CONF: services,
+        AODH_WSGI_CONF: services,
+    }
+
+    @staticmethod
+    def reload_and_restart():
+        if ch_host.init_is_systemd():
+            subprocess.check_call(['systemctl', 'daemon-reload'])
+        # no need to restart aodh-api in ocata and onwards
 
 
 def install():
@@ -182,10 +212,7 @@ def upgrade_if_available(interfaces_list):
     AodhCharm.singleton.upgrade_if_available(interfaces_list)
 
 
-# TODO: drop once charm switches to apache+mod_wsgi
 def reload_and_restart():
-    """Reload systemd and restart aodh-api when override file changes
+    """Reload systemd and restart aodh API when override file changes
     """
-    if ch_host.init_is_systemd():
-        subprocess.check_call(['systemctl', 'daemon-reload'])
-        ch_host.service_restart('aodh-api')
+    AodhCharm.singleton.reload_and_restart()

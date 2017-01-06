@@ -1,5 +1,6 @@
 name: aodh
 summary: OpenStack Telemetry - Alarming service
+maintainer: OpenStack Charmers <openstack-charmers@lists.ubuntu.com>
 description: |
  Ceilometer aims to deliver a Single Point Of Contact for billing systems,
  providing all the counters they need to establish customer billing, across
@@ -9,10 +10,13 @@ description: |
  overall system.
  .
  Aodh provides the Alarming service as part of OpenStack telemetry.
+tags:
+  - openstack
 series:
   - xenial
   - trusty
   - yakkety
+subordinate: false
 requires:
   mongodb:
     interface: mongodb
