@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import charms.reactive as reactive
-import charmhelpers.core.hookenv as hookenv
 
 # This charm's library contains all of the handler code associated with
 # aodh
@@ -51,7 +50,7 @@ def setup_database(database):
     """On receiving database credentials, configure the database on the
     interface.
     """
-    database.configure('aodh', 'aodh', hookenv.unit_private_ip())
+    database.configure('aodh', 'aodh')
     aodh.assess_status()
 
 

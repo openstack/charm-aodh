@@ -88,11 +88,12 @@ class TestAodhHandlers(unittest.TestCase):
         self._patches = None
         self._patches_start = None
 
-    def patch(self, obj, attr, return_value=None):
+    def patch(self, obj, attr, return_value=None, side_effect=None):
         mocked = mock.patch.object(obj, attr)
         self._patches[attr] = mocked
         started = mocked.start()
         started.return_value = return_value
+        started.side_effect = side_effect
         self._patches_start[attr] = started
         setattr(self, attr, started)
 
@@ -152,11 +153,9 @@ class TestAodhHandlers(unittest.TestCase):
 
     def test_database(self):
         database = mock.MagicMock()
-        self.patch(handlers.hookenv, 'unit_private_ip', 'private_ip')
         self.patch(handlers.aodh, 'assess_status')
         handlers.setup_database(database)
-        database.configure.assert_called_once_with(
-            'aodh', 'aodh', 'private_ip')
+        database.configure.assert_called_once_with('aodh', 'aodh')
 
     def test_setup_endpoint(self):
         self.patch(handlers.aodh, 'setup_endpoint')
