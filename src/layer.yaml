@@ -4,3 +4,6 @@ options:
     use_venv: True
     include_system_packages: True
 repo: https://github.com/openstack/charm-aodh
+config:
+  deletes:
+    - verbose
