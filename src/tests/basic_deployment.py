@@ -48,7 +48,7 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
            """
         this_service = {'name': 'aodh'}
         other_services = [
-            {'name': 'percona-cluster', 'constraints': {'mem': '3072M'}},
+            {'name': 'percona-cluster'},
             {'name': 'rabbitmq-server'},
             {'name': 'keystone'},
             {'name': 'mongodb'},
@@ -77,10 +77,7 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
             'admin-token': 'ubuntutesting'
         }
         pxc_config = {
-            'dataset-size': '25%',
             'max-connections': 1000,
-            'root-password': 'ChangeMe123',
-            'sst-password': 'ChangeMe123',
         }
         configs = {
             'keystone': keystone_config,
@@ -336,9 +333,10 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
         if self._get_openstack_release() >= self.xenial_ocata:
             services = {
                 'apache2': conf_file,
-                'aodh-evaluator - AlarmEvaluationService(0)': conf_file,
-                'aodh-notifier - AlarmNotifierService(0)': conf_file,
-                'aodh-listener - EventAlarmEvaluationService(0)': conf_file,
+                'aodh-evaluator: AlarmEvaluationService worker(0)': conf_file,
+                'aodh-notifier: AlarmNotifierService worker(0)': conf_file,
+                'aodh-listener: EventAlarmEvaluationService'
+                ' worker(0)': conf_file,
             }
         elif self._get_openstack_release() >= self.xenial_newton:
             services = {
