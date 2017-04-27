@@ -51,7 +51,8 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
             {'name': 'percona-cluster'},
             {'name': 'rabbitmq-server'},
             {'name': 'keystone'},
-            {'name': 'mongodb'},
+            {'name': 'mongodb',
+             'location': 'cs:~1chb1n/{}/mongodb'.format(self.series)},
             {'name': 'ceilometer'}
         ]
         super(AodhBasicDeployment, self)._add_services(this_service,
