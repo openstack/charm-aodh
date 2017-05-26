@@ -105,6 +105,9 @@ class AodhCharm(charms_openstack.charm.HAOpenStackCharm):
             ('2', 'mitaka'),
             ('3', 'newton'),
             ('4', 'ocata'),
+            ('5', 'pike'),
+            ('6', 'queens'),
+            ('7', 'rocky'),
         ]),
     }
 
