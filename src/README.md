@@ -16,6 +16,6 @@ Aodh relies on services from the mongodb, rabbitmq-server and keystone charms:
 
 # Bugs
 
-Please report bugs on [Launchpad](https://bugs.launchpad.net/charms/+source/aodh/+filebug).
+Please report bugs on [Launchpad](https://bugs.launchpad.net/charm-aodh/+filebug).
 
 For general questions please refer to the OpenStack [Charm Guide](http://docs.openstack.org/developer/charm-guide/).
