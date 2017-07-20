@@ -112,11 +112,11 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
         # Authenticate admin with aodh endpoint
         aodh_ep = self.keystone.service_catalog.url_for(
             service_type='alarming',
-            endpoint_type='publicURL')
+            interface='publicURL')
 
         keystone_ep = self.keystone.service_catalog.url_for(
             service_type='identity',
-            endpoint_type='publicURL')
+            interface='publicURL')
 
         auth = keystone_identity.V2Token(auth_url=keystone_ep,
                                          token=self.keystone.auth_token)
