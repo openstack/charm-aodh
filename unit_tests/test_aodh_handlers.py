@@ -160,6 +160,7 @@ class TestAodhHandlers(unittest.TestCase):
     def test_setup_endpoint(self):
         self.patch(handlers.aodh, 'setup_endpoint')
         self.patch(handlers.aodh, 'assess_status')
+        self.patch(handlers.aodh, 'configure_ssl')
         handlers.setup_endpoint('endpoint_object')
         self.setup_endpoint.assert_called_once_with('endpoint_object')
 

@@ -57,6 +57,7 @@ def setup_database(database):
 @reactive.when('identity-service.connected')
 def setup_endpoint(keystone):
     aodh.setup_endpoint(keystone)
+    aodh.configure_ssl()
     aodh.assess_status()
 
 
