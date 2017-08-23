@@ -16,7 +16,6 @@ series:
   - xenial
   - zesty
   - trusty
-  - yakkety
 subordinate: false
 requires:
   mongodb:
