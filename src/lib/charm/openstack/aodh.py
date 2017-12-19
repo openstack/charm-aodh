@@ -86,7 +86,7 @@ class AodhCharm(charms_openstack.charm.HAOpenStackCharm):
     }
 
     # Resource when in HA mode
-    ha_resources = ['vips', 'haproxy']
+    ha_resources = ['vips', 'haproxy', 'dnsha']
 
     # Aodh requires a message queue, database and keystone to work,
     # so these are the 'required' relationships for the service to
