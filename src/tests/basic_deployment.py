@@ -1,11 +1,9 @@
-import subprocess
 import amulet
+import subprocess
 import json
 import time
 
 import aodhclient.client as aodh_client
-from keystoneclient import session as keystone_session
-from keystoneclient.auth import identity as keystone_identity
 
 from charmhelpers.contrib.openstack.amulet.deployment import (
     OpenStackAmuletDeployment
@@ -23,6 +21,9 @@ u = OpenStackAmuletUtils(DEBUG)
 class AodhBasicDeployment(OpenStackAmuletDeployment):
     """Amulet tests on a basic aodh deployment."""
 
+    no_origin = ['memcached', 'percona-cluster', 'rabbitmq-server',
+                 'ceph-mon', 'ceph-osd']
+
     def __init__(self, series, openstack=None, source=None, stable=False):
         """Deploy the entire test environment."""
         super(AodhBasicDeployment, self).__init__(series, openstack,
@@ -33,7 +34,7 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
         self._deploy()
 
         u.log.info('Waiting on extended status checks...')
-        exclude_services = ['mongodb']
+        exclude_services = ['mongodb', 'memcached']
         self._auto_wait_for_status(exclude_services=exclude_services)
 
         self.d.sentry.wait()
@@ -51,12 +52,22 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
             {'name': 'percona-cluster'},
             {'name': 'rabbitmq-server'},
             {'name': 'keystone'},
-            {'name': 'mongodb',
-             'location': 'cs:~1chb1n/{}/mongodb'.format(self.series)},
             {'name': 'ceilometer'}
         ]
-        super(AodhBasicDeployment, self)._add_services(this_service,
-                                                       other_services)
+        if self._get_openstack_release() >= self.xenial_queens:
+            other_services.extend([
+                {'name': 'gnocchi'},
+                {'name': 'memcached', 'location': 'cs:memcached'},
+                {'name': 'ceph-mon', 'units': 3},
+                {'name': 'ceph-osd', 'units': 3}])
+        else:
+            other_services.append({
+                'name': 'mongodb',
+                'location': 'cs:~1chb1n/{}/mongodb'.format(self.series)})
+        super(AodhBasicDeployment, self)._add_services(
+            this_service,
+            other_services,
+            no_origin=self.no_origin)
 
     def _add_relations(self):
         """Add all of the relations for the services."""
@@ -65,10 +76,26 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
             'aodh:amqp': 'rabbitmq-server:amqp',
             'aodh:identity-service': 'keystone:identity-service',
             'keystone:shared-db': 'percona-cluster:shared-db',
-            'ceilometer:identity-service': 'keystone:identity-service',
-            'ceilometer:shared-db': 'mongodb:database',
             'ceilometer:amqp': 'rabbitmq-server:amqp',
         }
+        if self._get_openstack_release() >= self.xenial_queens:
+            additional_relations = {
+                'ceilometer:identity-credentials': 'keystone:'
+                                                   'identity-credentials',
+                'ceilometer:identity-notifications': 'keystone:'
+                                                     'identity-notifications',
+                'ceilometer:metric-service': 'gnocchi:metric-service',
+                'ceph-mon:osd': 'ceph-osd:mon',
+                'gnocchi:identity-service': 'keystone:identity-service',
+                'gnocchi:shared-db': 'percona-cluster:shared-db',
+                'gnocchi:storage-ceph': 'ceph-mon:client',
+                'gnocchi:coordinator-memcached': 'memcached:cache',
+            }
+        else:
+            additional_relations = {
+                'ceilometer:shared-db': 'mongodb:database',
+                'ceilometer:identity-service': 'keystone:identity-service'}
+        relations.update(additional_relations)
         super(AodhBasicDeployment, self)._add_relations(relations)
 
     def _configure_services(self):
@@ -84,6 +111,10 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
             'keystone': keystone_config,
             'percona-cluster': pxc_config,
         }
+        if self._get_openstack_release() >= self.xenial_queens:
+            configs['ceph-osd'] = {'osd-devices': '/dev/vdb',
+                                   'osd-reformat': 'yes',
+                                   'ephemeral-unmount': '/mnt'}
         super(AodhBasicDeployment, self)._configure_services(configs)
 
     def _get_token(self):
@@ -96,7 +127,6 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
         self.pxc_sentry = self.d.sentry['percona-cluster'][0]
         self.keystone_sentry = self.d.sentry['keystone'][0]
         self.rabbitmq_sentry = self.d.sentry['rabbitmq-server'][0]
-        self.mongodb_sentry = self.d.sentry['mongodb'][0]
         self.ceil_sentry = self.d.sentry['ceilometer'][0]
         u.log.debug('openstack release val: {}'.format(
             self._get_openstack_release()))
@@ -104,25 +134,19 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
             self._get_openstack_release_string()))
 
         # Authenticate admin with keystone endpoint
-        self.keystone = u.authenticate_keystone_admin(self.keystone_sentry,
-                                                      user='admin',
-                                                      password='openstack',
-                                                      tenant='admin')
+        self.keystone_session, self.keystone = u.get_default_keystone_session(
+            self.keystone_sentry,
+            openstack_release=self._get_openstack_release())
 
         # Authenticate admin with aodh endpoint
         aodh_ep = self.keystone.service_catalog.url_for(
             service_type='alarming',
             interface='publicURL')
 
-        keystone_ep = self.keystone.service_catalog.url_for(
-            service_type='identity',
-            interface='publicURL')
-
-        auth = keystone_identity.V2Token(auth_url=keystone_ep,
-                                         token=self.keystone.auth_token)
-        sess = keystone_session.Session(auth=auth)
-        self.aodh = aodh_client.Client(version=2, session=sess,
-                                       endpoint_override=aodh_ep)
+        self.aodh = aodh_client.Client(
+            version=2,
+            session=self.keystone_session,
+            endpoint_override=aodh_ep)
 
     def _run_action(self, unit_id, action, *args):
         command = ["juju", "action", "do", "--format=json", unit_id, action]
@@ -185,13 +209,14 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
             'internalURL': u.valid_url
         }
         expected = {
-            'metering': [endpoint_check],
-            'identity': [endpoint_check],
             'alarming': [endpoint_check],
         }
         actual = self.keystone.service_catalog.get_endpoints()
 
-        ret = u.validate_svc_catalog_endpoint_data(expected, actual)
+        ret = u.validate_svc_catalog_endpoint_data(
+            expected,
+            actual,
+            openstack_release=self._get_openstack_release())
         if ret:
             amulet.raise_status(amulet.FAIL, msg=ret)
 
@@ -210,8 +235,13 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
                     'publicurl': u.valid_url,
                     'service_id': u.not_null}
 
-        ret = u.validate_endpoint_data(endpoints, admin_port, internal_port,
-                                       public_port, expected)
+        ret = u.validate_endpoint_data(
+            endpoints,
+            admin_port,
+            internal_port,
+            public_port,
+            expected,
+            openstack_release=self._get_openstack_release())
         if ret:
             message = 'Aodh endpoint: {}'.format(ret)
             amulet.raise_status(amulet.FAIL, msg=message)
