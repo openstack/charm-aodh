@@ -113,7 +113,7 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
         }
         if self._get_openstack_release() >= self.xenial_queens:
             configs['ceph-osd'] = {'osd-devices': '/dev/vdb',
-                                   'osd-reformat': 'yes',
+                                   'osd-reformat': True,
                                    'ephemeral-unmount': '/mnt'}
         super(AodhBasicDeployment, self)._configure_services(configs)
 
