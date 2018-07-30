@@ -111,6 +111,8 @@ class AodhCharm(charms_openstack.charm.HAOpenStackCharm):
         ]),
     }
 
+    group = 'aodh'
+
     @staticmethod
     def reload_and_restart():
         if ch_host.init_is_systemd():
