@@ -150,6 +150,30 @@ class AodhCharmOcata(AodhCharm):
         # no need to restart aodh-api in ocata and onwards
 
 
+class AodhCharmRocky(AodhCharmOcata):
+
+    release = 'rocky'
+
+    # Switch to Python 3 for Rocky onwards
+    packages = [
+        'aodh-api',
+        'aodh-evaluator',
+        'aodh-expirer',
+        'aodh-notifier',
+        'aodh-listener',
+        'python3-aodh',
+        'libapache2-mod-wsgi-py3',
+        'python-apt',  # NOTE: workaround for hacluster suboridinate
+    ]
+
+    purge_packages = [
+        'python-aodh',
+        'python-memcache',
+    ]
+
+    python_version = 3
+
+
 def install():
     """Use the singleton from the AodhCharm to install the packages on the
     unit
