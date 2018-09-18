@@ -148,7 +148,6 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
     def _run_action(self, unit_id, action, *args):
         command = ["juju", "action", "do", "--format=json", unit_id, action]
         command.extend(args)
-        print("Running command: %s\n" % " ".join(command))
         output = subprocess.check_output(command)
         output_json = output.decode(encoding="UTF-8")
         data = json.loads(output_json)
@@ -344,19 +343,7 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
         assert(self.aodh.capabilities.list() != [])
         u.log.debug('OK')
 
-    def test_900_restart_on_config_change(self):
-        """Verify that the specified services are restarted when the config
-           is changed.
-           """
-        sentry = self.aodh_sentry
-        juju_service = 'aodh'
-
-        # Expected default and alternate values
-        set_default = {'debug': 'False'}
-        set_alternate = {'debug': 'True'}
-
-        # Services which are expected to restart upon config change,
-        # and corresponding config files affected by the change
+    def get_service_map(self):
         conf_file = '/etc/aodh/aodh.conf'
         if self._get_openstack_release() >= self.xenial_ocata:
             services = {
@@ -382,6 +369,23 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
                 'aodh-notifier': conf_file,
                 'aodh-listener': conf_file,
             }
+        return services
+
+    def test_900_restart_on_config_change(self):
+        """Verify that the specified services are restarted when the config
+           is changed.
+           """
+        sentry = self.aodh_sentry
+        juju_service = 'aodh'
+
+        # Expected default and alternate values
+        set_default = {'debug': 'False'}
+        set_alternate = {'debug': 'True'}
+
+        # Services which are expected to restart upon config change,
+        # and corresponding config files affected by the change
+        conf_file = '/etc/aodh/aodh.conf'
+        services = self.get_service_map()
 
         # Make config change, check for service restarts
         u.log.debug('Making config change on {}...'.format(juju_service))
@@ -404,27 +408,19 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
         self.d.configure(juju_service, set_default)
         u.log.debug('OK')
 
-    def _test_910_pause_and_resume(self):
+    def _assert_services(self, should_run):
+        u.get_unit_process_ids(
+            {self.aodh_sentry: set(self.get_service_map().keys())},
+            expect_success=should_run)
+
+    def test_910_pause_and_resume(self):
         """The services can be paused and resumed. """
-        u.log.debug('Checking pause and resume actions...')
-        unit_name = "aodh/0"
-        unit = self.d.sentry['aodh'][0]
-        juju_service = 'aodh'
+        self._assert_services(should_run=True)
+        action_id = u.run_action(self.aodh_sentry, "pause")
+        assert u.wait_on_action(action_id), "Pause action failed."
 
-        assert u.status_get(unit)[0] == "active"
+        self._assert_services(should_run=False)
 
-        action_id = self._run_action(unit_name, "pause")
-        assert self._wait_on_action(action_id), "Pause action failed."
-        assert u.status_get(unit)[0] == "maintenance"
-
-        # trigger config-changed to ensure that services are still stopped
-        u.log.debug("Making config change on aodh ...")
-        self.d.configure(juju_service, {'debug': 'True'})
-        assert u.status_get(unit)[0] == "maintenance"
-        self.d.configure(juju_service, {'debug': 'False'})
-        assert u.status_get(unit)[0] == "maintenance"
-
-        action_id = self._run_action(unit_name, "resume")
-        assert self._wait_on_action(action_id), "Resume action failed."
-        assert u.status_get(unit)[0] == "active"
-        u.log.debug('OK')
+        action_id = u.run_action(self.aodh_sentry, "resume")
+        assert u.wait_on_action(action_id), "Resume action failed"
+        self._assert_services(should_run=True)
