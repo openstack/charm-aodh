@@ -76,13 +76,13 @@ class TestAodhAdapters(Helper):
             aodh.charms_openstack.adapters.APIConfigurationAdapter,
             'get_network_addresses')
         cluster_relation = mock.MagicMock()
-        cluster_relation.relation_name = 'cluster'
+        cluster_relation.endpoint_name = 'cluster'
         amqp_relation = mock.MagicMock()
-        amqp_relation.relation_name = 'amqp'
+        amqp_relation.endpoint_name = 'amqp'
         shared_db_relation = mock.MagicMock()
-        shared_db_relation.relation_name = 'shared_db'
+        shared_db_relation.endpoint_name = 'shared_db'
         other_relation = mock.MagicMock()
-        other_relation.relation_name = 'other'
+        other_relation.endpoint_name = 'other'
         other_relation.thingy = 'help'
         # verify that the class is created with a AodhConfigurationAdapter
         b = aodh.AodhAdapters([amqp_relation,
