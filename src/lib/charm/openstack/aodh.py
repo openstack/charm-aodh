@@ -30,7 +30,10 @@ AODH_API_SYSTEMD_CONF = (
 AODH_WSGI_CONF = '/etc/apache2/sites-available/aodh-api.conf'
 
 
-charms_openstack.charm.use_defaults('charm.default-select-release')
+charms_openstack.charm.use_defaults(
+    'charm.default-select-release',
+    'upgrade-charm'
+)
 
 
 class AodhAdapters(charms_openstack.adapters.OpenStackAPIRelationAdapters):

@@ -3,5 +3,6 @@ layers
 .tox
 interfaces
 .testrepository
+.stestr
 *__pycache__*
 *.pyc

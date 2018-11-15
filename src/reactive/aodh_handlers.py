@@ -99,11 +99,6 @@ def cluster_connected(hacluster):
     aodh.configure_ha_resources(hacluster)
 
 
-@reactive.hook('upgrade-charm')
-def upgrade_charm():
-    aodh.install()
-
-
 # TODO: drop once charm switches to apache+mod_wsgi
 @reactive.when_file_changed(aodh.AODH_API_SYSTEMD_CONF)
 def systemd_override_changed():
