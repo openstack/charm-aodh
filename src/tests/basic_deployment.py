@@ -43,7 +43,7 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
 
         self.d.sentry.wait()
         self._initialize_tests()
-        if self._get_openstack_release() >= self.xenial_pike:
+        if self._get_openstack_release() >= self.xenial_queens:
             self.run_ceilometer_upgrade_action()
 
     def _add_services(self):
