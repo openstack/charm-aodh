@@ -24,7 +24,7 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
     no_origin = ['memcached', 'percona-cluster', 'rabbitmq-server',
                  'ceph-mon', 'ceph-osd']
 
-    def __init__(self, series, openstack=None, source=None, stable=False):
+    def __init__(self, series, openstack=None, source=None, stable=True):
         """Deploy the entire test environment."""
         super(AodhBasicDeployment, self).__init__(series, openstack,
                                                   source, stable)
