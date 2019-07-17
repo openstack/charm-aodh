@@ -55,7 +55,7 @@ class AodhBasicDeployment(OpenStackAmuletDeployment):
            """
         this_service = {'name': 'aodh'}
         other_services = [
-            {'name': 'percona-cluster'},
+            self.get_percona_service_entry(),
             {'name': 'rabbitmq-server'},
             {'name': 'keystone'},
             {'name': 'ceilometer'}
