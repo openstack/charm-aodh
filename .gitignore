@@ -6,3 +6,4 @@ interfaces
 .stestr
 *__pycache__*
 *.pyc
+.idea
