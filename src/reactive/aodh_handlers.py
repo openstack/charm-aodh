@@ -14,9 +14,15 @@
 
 import charms.reactive as reactive
 
+import charms_openstack.charm as charm
+
 # This charm's library contains all of the handler code associated with
 # aodh
 import charm.openstack.aodh as aodh
+
+charm.use_defaults(
+    'certificates.available',
+)
 
 
 # Minimal inferfaces required for operation
