@@ -85,7 +85,7 @@ class AodhCharm(charms_openstack.charm.HAOpenStackCharm):
     # file changes
     restart_map = {
         AODH_CONF: services,
-        AODH_API_SYSTEMD_CONF: 'aodh-api',
+        AODH_API_SYSTEMD_CONF: ['aodh-api'],
     }
 
     # Resource when in HA mode
@@ -123,6 +123,23 @@ class AodhCharm(charms_openstack.charm.HAOpenStackCharm):
         if ch_host.init_is_systemd():
             subprocess.check_call(['systemctl', 'daemon-reload'])
             ch_host.service_restart('aodh-api')
+
+
+class AodhCharmNewton(AodhCharm):
+    """Newton uses the aodh-api standalone systemd. If the systemd definition
+       changes the a systemctl daemon-reload is needed.
+    """
+    release = 'newton'
+
+    def render_with_interfaces(self, interface_list):
+        if os.path.exists(AODH_API_SYSTEMD_CONF):
+            old_hash = ch_host.file_hash(AODH_API_SYSTEMD_CONF)
+        else:
+            old_hash = ''
+        super(AodhCharmNewton, self).render_with_interfaces(interface_list)
+        new_hash = ch_host.file_hash(AODH_API_SYSTEMD_CONF)
+        if old_hash != new_hash:
+            self.reload_and_restart()
 
 
 class AodhCharmOcata(AodhCharm):

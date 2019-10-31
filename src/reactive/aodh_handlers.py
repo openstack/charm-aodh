@@ -103,9 +103,3 @@ def run_db_migration():
 @reactive.when('ha.connected')
 def cluster_connected(hacluster):
     aodh.configure_ha_resources(hacluster)
-
-
-# TODO: drop once charm switches to apache+mod_wsgi
-@reactive.when_file_changed(aodh.AODH_API_SYSTEMD_CONF)
-def systemd_override_changed():
-    aodh.reload_and_restart()
