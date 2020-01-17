@@ -113,6 +113,7 @@ class AodhCharm(charms_openstack.charm.HAOpenStackCharm):
             ('7', 'rocky'),
             ('8', 'stein'),
             ('9', 'train'),
+            ('10', 'ussuri'),
         ]),
     }
 
