@@ -23,7 +23,7 @@ machines:
 # time, given that machine "0" comes up way before machine "7"
 applications:
   percona-cluster:
-    charm: cs:~openstack-charmers-next/percona-cluster
+    charm: cs:percona-cluster
     num_units: 1
     options:
       source: *openstack-origin
@@ -38,28 +38,28 @@ applications:
     to:
       - '1'
   rabbitmq-server:
-    charm: cs:~openstack-charmers-next/rabbitmq-server
+    charm: cs:rabbitmq-server
     num_units: 1
     options:
       source: *openstack-origin
     to:
       - '2'
   keystone:
-    charm: cs:~openstack-charmers-next/keystone
+    charm: cs:keystone
     num_units: 1
     options:
       openstack-origin: *openstack-origin
     to:
       - '3'
   ceilometer:
-    charm: cs:~openstack-charmers-next/ceilometer
+    charm: cs:ceilometer
     num_units: 1
     options:
       openstack-origin: *openstack-origin
     to:
       - '4'
   ceph-osd:
-    charm: cs:~openstack-charmers-next/ceph-osd
+    charm: cs:ceph-osd
     num_units: 3
     storage:
       osd-devices: 'cinder,10G'
@@ -70,7 +70,7 @@ applications:
       - '6'
       - '7'
   ceph-mon:
-    charm: cs:~openstack-charmers-next/ceph-mon
+    charm: cs:ceph-mon
     num_units: 3
     options:
       expected-osd-count: 3
@@ -81,7 +81,7 @@ applications:
       - '9'
       - '10'
   gnocchi:
-    charm: cs:~openstack-charmers-next/gnocchi
+    charm: cs:gnocchi
     num_units: 1
     options:
       openstack-origin: *openstack-origin
