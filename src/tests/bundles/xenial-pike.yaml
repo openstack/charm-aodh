@@ -32,7 +32,7 @@ applications:
       - '0'
   aodh:
     series: *series
-    charm: cs:aodh
+    charm: ../../../aodh
     num_units: 1
     options:
       openstack-origin: *openstack-origin
@@ -94,7 +94,7 @@ applications:
     to:
       - '12'
   mongodb:
-    charm: cs:~1chb1n/xenial/mongodb
+    charm: cs:xenial/mongodb
     num_units: 1
     to:
       - '13'

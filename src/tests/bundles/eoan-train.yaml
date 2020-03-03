@@ -31,7 +31,7 @@ applications:
       - '0'
   aodh:
     series: *series
-    charm: cs:aodh
+    charm: ../../../aodh
     num_units: 1
     options:
       openstack-origin: *openstack-origin
