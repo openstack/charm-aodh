@@ -1,7 +1,6 @@
 charm_name: aodh
 
 gate_bundles:
-  - trusty-mitaka
   - xenial-mitaka
   - xenial-ocata
   - xenial-pike
@@ -10,6 +9,7 @@ gate_bundles:
   - bionic-rocky
   - bionic-stein
   - bionic-train
+  - trusty-mitaka
 smoke_bundles:
   - bionic-train
 dev_bundles:
