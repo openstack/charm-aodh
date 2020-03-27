@@ -22,6 +22,7 @@ import charm.openstack.aodh as aodh
 
 charm.use_defaults(
     'certificates.available',
+    'cluster.available',
 )
 
 
