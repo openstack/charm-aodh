@@ -52,7 +52,7 @@ applications:
     to:
       - '4'
   mongodb:
-    charm: cs:~1chb1n/trusty/mongodb
+    charm: cs:trusty/mongodb
     num_units: 1
     to:
       - '5'
