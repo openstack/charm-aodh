@@ -14,8 +14,9 @@
 
 import unittest
 
-import mock
 import charms_openstack.test_utils as test_utils
+from unittest import mock
+
 import reactive.aodh_handlers as handlers
 
 
