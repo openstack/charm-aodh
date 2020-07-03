@@ -21,6 +21,7 @@ import charmhelpers.core.host as ch_host
 import charms_openstack.charm
 import charms_openstack.adapters
 import charms_openstack.ip as os_ip
+import charms_openstack.plugins
 
 AODH_DIR = '/etc/aodh'
 AODH_CONF = os.path.join(AODH_DIR, 'aodh.conf')
@@ -49,7 +50,8 @@ class AodhAdapters(charms_openstack.adapters.OpenStackAPIRelationAdapters):
             charm_instance=charm_instance)
 
 
-class AodhCharm(charms_openstack.charm.HAOpenStackCharm):
+class AodhCharm(charms_openstack.plugins.PolicydOverridePlugin,
+                charms_openstack.charm.HAOpenStackCharm):
 
     # Internal name of charm + keystone endpoint
     service_name = name = 'aodh'
@@ -118,6 +120,9 @@ class AodhCharm(charms_openstack.charm.HAOpenStackCharm):
     }
 
     group = 'aodh'
+
+    # policyd override constants
+    policyd_service_name = 'aodh'
 
     @staticmethod
     def reload_and_restart():

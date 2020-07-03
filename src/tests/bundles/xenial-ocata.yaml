@@ -11,6 +11,14 @@ machines:
   3: {}
   4: {}
   5: {}
+  6: {}
+  7: {}
+  8: {}
+  9: {}
+  10: {}
+  11: {}
+  12: {}
+  13: {}
 
 # We specify machine placements for these to improve iteration
 # time, given that machine "0" comes up way before machine "7"
@@ -51,14 +59,50 @@ applications:
       openstack-origin: *openstack-origin
     to:
       - '4'
+  ceph-osd:
+    charm: cs:~openstack-charmers-next/ceph-osd
+    num_units: 3
+    storage:
+      osd-devices: 'cinder,10G'
+    options:
+      source: *openstack-origin
+    to:
+      - '5'
+      - '6'
+      - '7'
+  ceph-mon:
+    charm: cs:~openstack-charmers-next/ceph-mon
+    num_units: 3
+    options:
+      expected-osd-count: 3
+      monitor-count: '3'
+      source: *openstack-origin
+    to:
+      - '8'
+      - '9'
+      - '10'
+  gnocchi:
+    charm: cs:~openstack-charmers-next/gnocchi
+    num_units: 1
+    options:
+      openstack-origin: *openstack-origin
+    to:
+      - '11'
+  memcached:
+    charm: cs:~memcached-team/memcached
+    num_units: 1
+    to:
+      - '12'
   mongodb:
     charm: cs:xenial/mongodb
     num_units: 1
     to:
-      - '5'
+      - '13'
 relations:
   - - 'keystone:shared-db'
     - 'percona-cluster:shared-db'
+  - - 'ceph-osd:mon'
+    - 'ceph-mon:osd'
   - - 'aodh:shared-db'
     - 'percona-cluster:shared-db'
   - - 'aodh:amqp'
@@ -75,3 +119,13 @@ relations:
     - 'mongodb:database'
   - - 'ceilometer:identity-service'
     - 'keystone:identity-service'
+  - - 'ceilometer:metric-service'
+    - 'gnocchi:metric-service'
+  - - 'gnocchi:identity-service'
+    - 'keystone:identity-service'
+  - - 'gnocchi:shared-db'
+    - 'percona-cluster:shared-db'
+  - - 'gnocchi:storage-ceph'
+    - 'ceph-mon:client'
+  - - 'gnocchi:coordinator-memcached'
+    - 'memcached:cache'
