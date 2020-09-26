@@ -128,10 +128,10 @@ class TestAodhHandlers(unittest.TestCase):
                 self.assertTrue(f in p.keys(),
                                 "{} not found".format(f))
                 # check that the lists are equal
-                l = []
+                items = []
                 for a in args:
-                    l += a['args'][:]
-                self.assertEqual(sorted(l), sorted(p[f]),
+                    items += a['args'][:]
+                self.assertEqual(sorted(items), sorted(p[f]),
                                  "{}: incorrect state registration".format(f))
 
     def test_install_packages(self):
