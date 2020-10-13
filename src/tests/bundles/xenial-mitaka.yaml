@@ -56,6 +56,8 @@ applications:
     num_units: 1
     to:
       - '5'
+  nrpe:
+    charm: cs:nrpe
 relations:
   - - 'keystone:shared-db'
     - 'percona-cluster:shared-db'
@@ -75,3 +77,5 @@ relations:
     - 'mongodb:database'
   - - 'ceilometer:identity-service'
     - 'keystone:identity-service'
+  - - 'aodh:nrpe-external-master'
+    - 'nrpe:nrpe-external-master'

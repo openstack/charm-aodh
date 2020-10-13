@@ -22,6 +22,10 @@ subordinate: false
 requires:
   mongodb:
     interface: mongodb
+provides:
+  nrpe-external-master:
+    interface: nrpe-external-master
+    scope: container
 resources:
   policyd-override:
     type: file

@@ -27,6 +27,9 @@ target_deploy_status:
   mongodb:
     workload-status: unknown
     workload-status-message: ''
+  nrpe:
+    workload-status: blocked
+    workload-status-message: "Nagios server not configured or related"
 tests_options:
   force_deploy:
     - groovy-victoria

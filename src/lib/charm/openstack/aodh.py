@@ -17,6 +17,7 @@ import os
 import subprocess
 
 import charmhelpers.core.host as ch_host
+import charmhelpers.contrib.charmsupport.nrpe as nrpe
 
 import charms_openstack.charm
 import charms_openstack.adapters
@@ -130,6 +131,15 @@ class AodhCharm(charms_openstack.plugins.PolicydOverridePlugin,
         if ch_host.init_is_systemd():
             subprocess.check_call(['systemctl', 'daemon-reload'])
             ch_host.service_restart('aodh-api')
+
+    def render_nrpe_checks(self):
+        """Configure Nagios NRPE checks."""
+        hostname = nrpe.get_nagios_hostname()
+        current_unit = nrpe.get_nagios_unit_name()
+        charm_nrpe = nrpe.NRPE(hostname=hostname)
+        nrpe.add_init_service_checks(
+            charm_nrpe, self.services, current_unit)
+        charm_nrpe.write()
 
 
 class AodhCharmNewton(AodhCharm):
@@ -290,3 +300,8 @@ def reload_and_restart():
     """Reload systemd and restart aodh API when override file changes
     """
     AodhCharm.singleton.reload_and_restart()
+
+
+def render_nrpe():
+    """Render NRPE service monitors."""
+    AodhCharm.singleton.render_nrpe_checks()

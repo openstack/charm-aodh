@@ -104,3 +104,14 @@ def run_db_migration():
 @reactive.when('ha.connected')
 def cluster_connected(hacluster):
     aodh.configure_ha_resources(hacluster)
+
+
+@reactive.when_none('charm.paused', 'is-update-status-hook')
+@reactive.when('config.complete')
+@reactive.when_any('config.changed.nagios_context',
+                   'config.changed.nagios_servicegroups',
+                   'endpoint.nrpe-external-master.changed',
+                   'nrpe-external-master.available')
+def configure_nrpe():
+    """Handle config-changed for NRPE options."""
+    aodh.render_nrpe()

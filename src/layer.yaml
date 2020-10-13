@@ -1,4 +1,4 @@
-includes: ['layer:openstack-api', 'interface:mongodb']
+includes: ['layer:openstack-api', 'interface:mongodb', 'interface:nrpe-external-master']
 options:
   basic:
     use_venv: True

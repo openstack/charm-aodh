@@ -92,6 +92,8 @@ applications:
     num_units: 1
     to:
       - '12'
+  nrpe:
+    charm: cs:nrpe
 relations:
   - - 'keystone:shared-db'
     - 'percona-cluster:shared-db'
@@ -119,3 +121,5 @@ relations:
     - 'ceph-mon:client'
   - - 'gnocchi:coordinator-memcached'
     - 'memcached:cache'
+  - - 'aodh:nrpe-external-master'
+    - 'nrpe:nrpe-external-master'
