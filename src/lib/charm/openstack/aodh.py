@@ -203,6 +203,22 @@ class AodhCharmRocky(AodhCharmOcata):
     python_version = 3
 
 
+class AodhCharmVictoria(AodhCharmRocky):
+
+    release = 'victoria'
+
+    packages = [
+        'aodh-api',
+        'aodh-evaluator',
+        'aodh-expirer',
+        'aodh-notifier',
+        'aodh-listener',
+        'python3-aodh',
+        'libapache2-mod-wsgi-py3',
+        'python3-apt',  # NOTE: workaround for hacluster suboridinate
+    ]
+
+
 def install():
     """Use the singleton from the AodhCharm to install the packages on the
     unit
