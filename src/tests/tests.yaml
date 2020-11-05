@@ -12,12 +12,12 @@ gate_bundles:
   - bionic-ussuri
   - focal-ussuri
   - focal-victoria
+  - groovy-victoria
   - trusty-mitaka
 smoke_bundles:
   - bionic-train
 dev_bundles:
   - eoan-train
-  - groovy-victoria
 tests:
   - zaza.openstack.charm_tests.aodh.tests.AodhTest
 configure:
