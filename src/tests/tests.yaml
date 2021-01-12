@@ -16,8 +16,6 @@ gate_bundles:
   - trusty-mitaka
 smoke_bundles:
   - bionic-train
-dev_bundles:
-  - eoan-train
 tests:
   - zaza.openstack.charm_tests.aodh.tests.AodhTest
 configure:
