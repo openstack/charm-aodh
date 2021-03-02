@@ -16,8 +16,8 @@ series:
 - xenial
 - bionic
 - focal
-- trusty
 - groovy
+- hirsute
 subordinate: false
 requires:
   mongodb:
