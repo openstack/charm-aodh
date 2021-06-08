@@ -15,41 +15,63 @@
 import unittest
 
 import mock
-
+import charms_openstack.test_utils as test_utils
 import reactive.aodh_handlers as handlers
 
 
-_when_args = {}
-_when_not_args = {}
+class TestRegisteredHooks(test_utils.TestRegisteredHooks):
+    """Run tests to ensure hooks are registered."""
 
-
-def mock_hook_factory(d):
-
-    def mock_hook(*args, **kwargs):
-
-        def inner(f):
-            # remember what we were passed.  Note that we can't actually
-            # determine the class we're attached to, as the decorator only gets
-            # the function.
-            try:
-                d[f.__name__].append(dict(args=args, kwargs=kwargs))
-            except KeyError:
-                d[f.__name__] = [dict(args=args, kwargs=kwargs)]
-            return f
-        return inner
-    return mock_hook
+    def test_registered_hooks(self):
+        """Test that the correct hooks are registered."""
+        defaults = [
+            'charm.installed',
+            'config.changed',
+            'charm.default-select-release',
+            'update-status',
+            'upgrade-charm',
+        ]
+        hook_set = {
+            'when': {
+                'setup_amqp_req': ('amqp.connected', ),
+                'setup_database': ('shared-db.connected', ),
+                'setup_endpoint': ('identity-service.connected', ),
+                'render_unclustered': ('charm.installed',
+                                       'shared-db.available',
+                                       'identity-service.available',
+                                       'amqp.available',),
+                'render_clustered': ('charm.installed',
+                                     'shared-db.available',
+                                     'identity-service.available',
+                                     'amqp.available',
+                                     'cluster.available',),
+                'run_db_migration': ('charm.installed',
+                                     'config.complete', ),
+                'cluster_connected': ('ha.connected', ),
+                'configure_nrpe': ('config.complete', ),
+            },
+            'when_not': {
+                'install_packages': ('charm.installed', ),
+                'render_unclustered': ('cluster.available', ),
+                'run_db_migration': ('db.synced', ),
+            },
+            'when_none': {
+                'configure_nrpe': ('charm.paused', 'is-update-status-hook', ),
+            },
+            'when_any': {
+                'configure_nrpe': ('config.changed.nagios_context',
+                                   'config.changed.nagios_servicegroups',
+                                   'endpoint.nrpe-external-master.changed',
+                                   'nrpe-external-master.available', ),
+            },
+        }
+        self.registered_hooks_test_helper(handlers, hook_set, defaults)
 
 
 class TestAodhHandlers(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls._patched_when = mock.patch('charms.reactive.when',
-                                       mock_hook_factory(_when_args))
-        cls._patched_when_started = cls._patched_when.start()
-        cls._patched_when_not = mock.patch('charms.reactive.when_not',
-                                           mock_hook_factory(_when_not_args))
-        cls._patched_when_not_started = cls._patched_when_not.start()
         # force requires to rerun the mock_hook decorator:
         # try except is Python2/Python3 compatibility as Python3 has moved
         # reload to importlib.
@@ -61,12 +83,6 @@ class TestAodhHandlers(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls._patched_when.stop()
-        cls._patched_when_started = None
-        cls._patched_when = None
-        cls._patched_when_not.stop()
-        cls._patched_when_not_started = None
-        cls._patched_when_not = None
         # and fix any breakage we did to the module
         try:
             reload(handlers)
@@ -93,46 +109,6 @@ class TestAodhHandlers(unittest.TestCase):
         started.side_effect = side_effect
         self._patches_start[attr] = started
         setattr(self, attr, started)
-
-    def test_registered_hooks(self):
-        # test that the hooks actually registered the relation expressions that
-        # are meaningful for this interface: this is to handle regressions.
-        # The keys are the function names that the hook attaches to.
-        when_patterns = {
-            'setup_amqp_req': ('amqp.connected', ),
-            'setup_database': ('shared-db.connected', ),
-            'setup_endpoint': ('identity-service.connected', ),
-            'render_unclustered': ('charm.installed',
-                                   'shared-db.available',
-                                   'identity-service.available',
-                                   'amqp.available',),
-            'render_clustered': ('charm.installed',
-                                 'shared-db.available',
-                                 'identity-service.available',
-                                 'amqp.available',
-                                 'cluster.available',),
-            'run_db_migration': ('charm.installed',
-                                 'config.complete', ),
-            'cluster_connected': ('ha.connected', ),
-        }
-        when_not_patterns = {
-            'install_packages': ('charm.installed', ),
-            'render_unclustered': ('cluster.available', ),
-            'run_db_migration': ('db.synced', ),
-        }
-        # check the when hooks are attached to the expected functions
-        for t, p in [(_when_args, when_patterns),
-                     (_when_not_args, when_not_patterns)]:
-            for f, args in t.items():
-                # check that function is in patterns
-                self.assertTrue(f in p.keys(),
-                                "{} not found".format(f))
-                # check that the lists are equal
-                items = []
-                for a in args:
-                    items += a['args'][:]
-                self.assertEqual(sorted(items), sorted(p[f]),
-                                 "{}: incorrect state registration".format(f))
 
     def test_install_packages(self):
         self.patch(handlers.aodh, 'install')

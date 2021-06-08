@@ -123,6 +123,29 @@ class TestAodhCharm(Helper):
         self.check_call.assert_called_once_with(['systemctl', 'daemon-reload'])
         self.service_restart.assert_called_once_with('aodh-api')
 
+    def test_render_nrpe(self):
+        """Test NRPE renders correctly pre Ocata."""
+        self.patch_object(aodh.nrpe, 'NRPE')
+        self.patch_object(aodh.nrpe, 'add_init_service_checks')
+        services = ['aodh-api',
+                    'aodh-evaluator',
+                    'aodh-notifier',
+                    'aodh-listener',
+                    ]
+        target = aodh.AodhCharmNewton()
+        target.render_nrpe_checks()
+        # Note that this list is valid for Ussuri
+        self.add_init_service_checks.assert_has_calls([
+            mock.call().add_init_service_checks(
+                mock.ANY,
+                services,
+                mock.ANY
+            ),
+        ])
+        self.NRPE.assert_has_calls([
+            mock.call().write(),
+        ])
+
 
 class TestAodhCharmOcata(Helper):
 
@@ -136,3 +159,23 @@ class TestAodhCharmOcata(Helper):
         self.init_is_systemd.return_value = True
         aodh.AodhCharmOcata.reload_and_restart()
         self.check_call.assert_called_once_with(['systemctl', 'daemon-reload'])
+
+    def test_render_nrpe(self):
+        """Test NRPE renders correctly in Ocata."""
+        self.patch_object(aodh.nrpe, 'NRPE')
+        self.patch_object(aodh.nrpe, 'add_init_service_checks')
+        services = ['aodh-evaluator', 'aodh-notifier',
+                    'aodh-listener', 'apache2']
+        target = aodh.AodhCharmOcata()
+        target.render_nrpe_checks()
+        # Note that this list is valid for Ussuri
+        self.add_init_service_checks.assert_has_calls([
+            mock.call().add_init_service_checks(
+                mock.ANY,
+                services,
+                mock.ANY
+            ),
+        ])
+        self.NRPE.assert_has_calls([
+            mock.call().write(),
+        ])
