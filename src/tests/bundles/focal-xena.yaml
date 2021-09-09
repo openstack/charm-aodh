@@ -1,7 +1,7 @@
 variables:
-  openstack-origin: &openstack-origin distro
+  openstack-origin: &openstack-origin cloud:focal-xena
 
-series: groovy
+series: focal
 
 machines:
   0:
@@ -48,16 +48,18 @@ applications:
   aodh:
     charm: ../../../aodh
     num_units: 1
+    options:
+      openstack-origin: *openstack-origin
     to:
       - '3'
 
   rabbitmq-server:
     charm: cs:~openstack-charmers-next/rabbitmq-server
     num_units: 1
-    to:
-      - '4'
     options:
       source: *openstack-origin
+    to:
+      - '4'
 
   keystone:
     charm: cs:~openstack-charmers-next/keystone
@@ -110,8 +112,7 @@ applications:
   memcached:
     charm: cs:~memcached-team/memcached
     num_units: 1
-    # Note that holding memcached at bionic as it's not available at
-    # focal/groovy yet.
+    # Note that holding memcached at bionic as it's not available at focal yet.
     series: bionic
     to:
       - '14'

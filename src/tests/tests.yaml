@@ -9,7 +9,8 @@ gate_bundles:
   - focal-ussuri
   - focal-victoria
   - focal-wallaby
-  - groovy-victoria
+  - focal-xena
+  - impish-xena
 dev_bundles:
   - trusty-mitaka
   - xenial-ocata
@@ -36,3 +37,4 @@ tests_options:
   force_deploy:
     - trusty-mitaka
     - hirsute-wallaby
+    - impish-xena
