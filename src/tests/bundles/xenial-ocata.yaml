@@ -30,7 +30,6 @@ applications:
       source: *openstack-origin
     to:
       - '0'
-    channel: candidate
   aodh:
     series: *series
     charm: ../../../aodh
@@ -46,7 +45,6 @@ applications:
       source: *openstack-origin
     to:
       - '2'
-    channel: candidate
   keystone:
     charm: cs:~openstack-charmers/keystone
     num_units: 1
@@ -54,7 +52,6 @@ applications:
       openstack-origin: *openstack-origin
     to:
       - '3'
-    channel: candidate
   ceilometer:
     charm: cs:~openstack-charmers/ceilometer
     num_units: 1
@@ -62,7 +59,6 @@ applications:
       openstack-origin: *openstack-origin
     to:
       - '4'
-    channel: candidate
   ceph-osd:
     charm: cs:~openstack-charmers/ceph-osd
     num_units: 3
@@ -74,7 +70,6 @@ applications:
       - '5'
       - '6'
       - '7'
-    channel: candidate
   ceph-mon:
     charm: cs:~openstack-charmers/ceph-mon
     num_units: 3
@@ -86,7 +81,6 @@ applications:
       - '8'
       - '9'
       - '10'
-    channel: candidate
   gnocchi:
     charm: cs:~openstack-charmers/gnocchi
     num_units: 1
@@ -94,7 +88,6 @@ applications:
       openstack-origin: *openstack-origin
     to:
       - '11'
-    channel: candidate
   memcached:
     charm: cs:~memcached-team/memcached
     num_units: 1

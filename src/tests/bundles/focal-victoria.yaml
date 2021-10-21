@@ -30,13 +30,10 @@ applications:
 
   keystone-mysql-router:
     charm: cs:~openstack-charmers/mysql-router
-    channel: candidate
   aodh-mysql-router:
     charm: cs:~openstack-charmers/mysql-router
-    channel: candidate
   gnocchi-mysql-router:
     charm: cs:~openstack-charmers/mysql-router
-    channel: candidate
 
   mysql-innodb-cluster:
     charm: cs:~openstack-charmers/mysql-innodb-cluster
@@ -47,7 +44,6 @@ applications:
       - '0'
       - '1'
       - '2'
-    channel: candidate
 
   aodh:
     charm: ../../../aodh
@@ -64,7 +60,6 @@ applications:
       source: *openstack-origin
     to:
       - '4'
-    channel: candidate
 
   keystone:
     charm: cs:~openstack-charmers/keystone
@@ -73,7 +68,6 @@ applications:
       openstack-origin: *openstack-origin
     to:
       - '5'
-    channel: candidate
 
   ceilometer:
     charm: cs:~openstack-charmers/ceilometer
@@ -82,7 +76,6 @@ applications:
       openstack-origin: *openstack-origin
     to:
       - '6'
-    channel: candidate
 
   ceph-osd:
     charm: cs:~openstack-charmers/ceph-osd
@@ -95,7 +88,6 @@ applications:
       - '7'
       - '8'
       - '9'
-    channel: candidate
 
   ceph-mon:
     charm: cs:~openstack-charmers/ceph-mon
@@ -108,7 +100,6 @@ applications:
       - '10'
       - '11'
       - '12'
-    channel: candidate
 
   gnocchi:
     charm: cs:~openstack-charmers/gnocchi
@@ -117,7 +108,6 @@ applications:
       openstack-origin: *openstack-origin
     to:
       - '13'
-    channel: candidate
 
   memcached:
     charm: cs:~memcached-team/memcached
