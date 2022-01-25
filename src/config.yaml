@@ -21,3 +21,5 @@ options:
     type: string
     description: |
       Comma separated list of nagios servicegroups for the service checks.
+  openstack-origin:
+    default: yoga

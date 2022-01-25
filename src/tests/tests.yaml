@@ -1,21 +1,13 @@
 charm_name: aodh
 
 gate_bundles:
-  - bionic-queens
-  - bionic-stein
-  - bionic-ussuri
-  - focal-ussuri
-  - focal-victoria
-  - focal-wallaby
   - focal-xena
-  - hirsute-wallaby
   - impish-xena
 dev_bundles:
-  - bionic-train
   - focal-yoga
   - jammy-yoga
 smoke_bundles:
-  - focal-ussuri
+  - focal-xena
 tests:
   - zaza.openstack.charm_tests.aodh.tests.AodhTest
 configure:
@@ -32,6 +24,5 @@ target_deploy_status:
     workload-status-message: "Nagios server not configured or related"
 tests_options:
   force_deploy:
-    - hirsute-wallaby
     - impish-xena
     - jammy-yoga
