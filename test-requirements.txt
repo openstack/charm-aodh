@@ -51,3 +51,4 @@ pbr==5.6.0       # vault
 cryptography<3.4 # vault, keystone-saml-mellon
 lxml             # keystone-saml-mellon
 hvac             # vault, barbican-vault
+psutil           # cinder-lvm

@@ -15,13 +15,13 @@ configure:
 target_deploy_status:
   ceilometer:
     workload-status: blocked
-    workload-status-message: Run the ceilometer-upgrade action on the leader to initialize ceilometer and gnocchi
+    workload-status-message-prefix: Run the ceilometer-upgrade action on the leader to initialize ceilometer and gnocchi
   mongodb:
     workload-status: unknown
-    workload-status-message: ''
+    workload-status-message-prefix: ''
   nrpe:
     workload-status: blocked
-    workload-status-message: "Nagios server not configured or related"
+    workload-status-message-prefix: "Nagios server not configured or related"
 tests_options:
   force_deploy:
     - impish-xena
