@@ -1,24 +1,11 @@
 charm_name: aodh
 
 gate_bundles:
-  - xenial-mitaka
-  - bionic-queens
-  - bionic-stein
-  - bionic-train
-  - bionic-ussuri
-  - focal-ussuri
-  - focal-victoria
   - focal-wallaby
   - focal-xena
-  - impish-xena
-dev_bundles:
-  - trusty-mitaka
-  - xenial-ocata
-  - xenial-pike
-  - xenial-queens
-  - hirsute-wallaby
+dev_bundles: []
 smoke_bundles:
-  - focal-ussuri
+  - focal-xena
 tests:
   - zaza.openstack.charm_tests.aodh.tests.AodhTest
 configure:
@@ -26,15 +13,12 @@ configure:
 target_deploy_status:
   ceilometer:
     workload-status: blocked
-    workload-status-message: Run the ceilometer-upgrade action on the leader to initialize ceilometer and gnocchi
+    workload-status-message-prefix: Run the ceilometer-upgrade action on the leader to initialize ceilometer and gnocchi
   mongodb:
     workload-status: unknown
-    workload-status-message: ''
+    workload-status-message-prefix: ''
   nrpe:
     workload-status: blocked
-    workload-status-message: "Nagios server not configured or related"
+    workload-status-message-prefix: "Nagios server not configured or related"
 tests_options:
-  force_deploy:
-    - trusty-mitaka
-    - hirsute-wallaby
-    - impish-xena
+  force_deploy: []
