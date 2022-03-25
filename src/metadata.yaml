@@ -14,7 +14,7 @@ tags:
 - openstack
 series:
 - focal
-- impish
+- jammy
 subordinate: false
 requires:
   mongodb:
