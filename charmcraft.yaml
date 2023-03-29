@@ -4,6 +4,8 @@ parts:
   charm:
     source: src/
     plugin: reactive
+    build-packages:
+      - libpython3-dev
     build-snaps:
       - charm
     build-environment:
