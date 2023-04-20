@@ -7,7 +7,7 @@ parts:
     build-packages:
       - libpython3-dev
     build-snaps:
-      - charm
+      - charm/3.x/stable
     build-environment:
       - CHARM_INTERFACES_DIR: /root/project/interfaces/
       - CHARM_LAYERS_DIR: /root/project/layers/
