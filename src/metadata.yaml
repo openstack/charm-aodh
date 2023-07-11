@@ -10,6 +10,7 @@ description: |
   overall system.
   .
   Aodh provides the Alarming service as part of OpenStack telemetry.
+docs: https://discourse.charmhub.io/t/aodh-docs-index/11004
 tags:
 - openstack
 series:
