@@ -1,7 +1,7 @@
 local_overlay_enabled: False
 
 variables:
-  openstack-origin: &openstack-origin cloud:jammy-zed
+  openstack-origin: &openstack-origin cloud:jammy-bobcat
 
 series: jammy
 
@@ -89,8 +89,6 @@ applications:
     num_units: 3
     storage:
       osd-devices: 'cinder,10G'
-    options:
-      source: *openstack-origin
     to:
       - '7'
       - '8'
@@ -103,7 +101,6 @@ applications:
     options:
       expected-osd-count: 3
       monitor-count: '3'
-      source: *openstack-origin
     to:
       - '10'
       - '11'
