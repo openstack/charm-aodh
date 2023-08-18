@@ -4,6 +4,9 @@ parts:
   charm:
     source: src/
     plugin: reactive
+    reactive-charm-build-arguments:
+      - --use-lock-file-branches
+      - --verbose
     build-snaps:
       - charm/3.x/stable
     build-environment:
