@@ -15,7 +15,6 @@ tags:
 - openstack
 series:
 - jammy
-- lunar
 - mantic
 subordinate: false
 requires:
