@@ -93,7 +93,7 @@ applications:
       - '7'
       - '8'
       - '9'
-    channel: reef/edge
+    channel: squid/edge
 
   ceph-mon:
     charm: ch:ceph-mon
@@ -105,7 +105,7 @@ applications:
       - '10'
       - '11'
       - '12'
-    channel: reef/edge
+    channel: squid/edge
 
   gnocchi:
     charm: ch:gnocchi
