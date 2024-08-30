@@ -1,13 +1,11 @@
 charm_name: aodh
 
 gate_bundles:
-  - jammy-antelope
-  - jammy-bobcat
-  - jammy-caracal
+  - noble-caracal
 dev_bundles:
   - noble-caracal
 smoke_bundles:
-  - jammy-caracal
+  - noble-caracal
 tests:
   - zaza.openstack.charm_tests.aodh.tests.AodhTest
 configure:

@@ -24,7 +24,7 @@ machines:
   12:
   13:
   14:
-    series: focal
+    series: noble
 
 # We specify machine placements for these to improve iteration
 # time, given that machine "0" comes up way before machine "7"
@@ -73,7 +73,7 @@ applications:
       openstack-origin: *openstack-origin
     to:
       - '5'
-    channel: 2024.1/edge
+    channel: latest/edge
 
   ceilometer:
     charm: ch:ceilometer
@@ -82,7 +82,7 @@ applications:
       openstack-origin: *openstack-origin
     to:
       - '6'
-    channel: 2024.1/edge
+    channel: latest/edge
 
   ceph-osd:
     charm: ch:ceph-osd
@@ -93,7 +93,7 @@ applications:
       - '7'
       - '8'
       - '9'
-    channel: reef/edge
+    channel: latest/edge
 
   ceph-mon:
     charm: ch:ceph-mon
@@ -105,7 +105,7 @@ applications:
       - '10'
       - '11'
       - '12'
-    channel: reef/edge
+    channel: latest/edge
 
   gnocchi:
     charm: ch:gnocchi
@@ -114,13 +114,13 @@ applications:
       openstack-origin: *openstack-origin
     to:
       - '13'
-    channel: 2024.1/edge
+    channel: latest/edge
 
   memcached:
     charm: ch:memcached
     num_units: 1
-    # Note that holding memcached at focal as it's not available at jammy yet.
-    series: focal
+    # Holding memcached at jammy as it's not available for noble
+    series: jammy
     to:
       - '14'
 

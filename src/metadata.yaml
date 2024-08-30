@@ -13,8 +13,6 @@ description: |
 docs: https://discourse.charmhub.io/t/aodh-docs-index/11004
 tags:
   - openstack
-series:
-  - jammy
 subordinate: false
 requires:
   mongodb:
