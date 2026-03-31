@@ -24,7 +24,7 @@ machines:
   12:
   13:
   14:
-    series: focal
+    series: jammy
 
 # We specify machine placements for these to improve iteration
 # time, given that machine "0" comes up way before machine "7"
@@ -119,8 +119,8 @@ applications:
   memcached:
     charm: ch:memcached
     num_units: 1
-    # Note that holding memcached at focal as it's not available at jammy yet.
-    series: focal
+    # Note that holding memcached at jammy as it's not available at jammy yet.
+    series: jammy
     to:
       - '14'
 
