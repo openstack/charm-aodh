@@ -23,6 +23,8 @@ class Helper(test_utils.PatchHelper):
 
     def setUp(self):
         super().setUp()
+        self.patch('charmhelpers.core.hookenv.is_subordinate',
+                   return_value=False)
         self.patch_release(aodh.AodhCharm.release)
 
 
