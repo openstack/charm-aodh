@@ -52,7 +52,7 @@ applications:
     channel: 8.0/edge
 
   aodh:
-    charm: ../../../aodh.charm
+    charm: ../../../aodh_ubuntu@22.04-amd64.charm
     num_units: 1
     options:
       openstack-origin: *openstack-origin
