@@ -4,7 +4,6 @@ gate_bundles:
   - jammy-antelope
 dev_bundles:
   - jammy-bobcat
-  - mantic-bobcat
 smoke_bundles:
   - jammy-yoga
 tests:
@@ -27,4 +26,3 @@ tests_options:
     # https://bugs.launchpad.net/charm-nrpe/+bug/1968008
     - jammy-antelope
     - jammy-bobcat
-    - mantic-bobcat
