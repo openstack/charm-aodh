@@ -24,7 +24,7 @@ machines:
   12:
   13:
   14:
-    series: noble
+    series: jammy
 
 # We specify machine placements for these to improve iteration
 # time, given that machine "0" comes up way before machine "7"
